@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react"
+import { useState, useCallback, useEffect } from "react"
 import useEmblaCarousel from 'embla-carousel-react'
 import { Button } from "@/components/ui/button"
 import {
@@ -12,15 +12,9 @@ import {
 import { cn } from "@/lib/utils"
 
 // Individual Card Components
-const BasicPlanCard = ({ cardHeight }: { cardHeight?: number }) => (
-	<div className="p-4 flex justify-center">
-		<div 
-			className="w-full max-w-sm" 
-			style={{ 
-				height: cardHeight ? `${cardHeight}px` : 'auto',
-				aspectRatio: cardHeight ? 'unset' : '1.78/1'
-			}}
-		>
+const BasicPlanCard = () => (
+	<div className="p-4 flex justify-center h-full">
+		<div className="w-full max-w-sm h-full">
 			<div className={cn(
 				"relative rounded-2xl p-4 w-full h-full flex flex-col",
 				"bg-gradient-to-br shadow-xl border border-white/20",
@@ -62,15 +56,9 @@ const BasicPlanCard = ({ cardHeight }: { cardHeight?: number }) => (
 	</div>
 )
 
-const ProfessionalPlanCard = ({ cardHeight }: { cardHeight?: number }) => (
-	<div className="p-4 flex justify-center">
-		<div 
-			className="w-full max-w-sm" 
-			style={{ 
-				height: cardHeight ? `${cardHeight}px` : 'auto',
-				aspectRatio: cardHeight ? 'unset' : '1.78/1'
-			}}
-		>
+const ProfessionalPlanCard = () => (
+	<div className="p-4 flex justify-center h-full">
+		<div className="w-full max-w-sm h-full">
 			<div className={cn(
 				"relative rounded-2xl p-4 w-full h-full flex flex-col",
 				"bg-gradient-to-br shadow-xl border border-white/20",
@@ -121,15 +109,9 @@ const ProfessionalPlanCard = ({ cardHeight }: { cardHeight?: number }) => (
 	</div>
 )
 
-const EnterprisePlanCard = ({ cardHeight }: { cardHeight?: number }) => (
-	<div className="p-4 flex justify-center">
-		<div 
-			className="w-full max-w-sm" 
-			style={{ 
-				height: cardHeight ? `${cardHeight}px` : 'auto',
-				aspectRatio: cardHeight ? 'unset' : '1.78/1'
-			}}
-		>
+const EnterprisePlanCard = () => (
+	<div className="p-4 flex justify-center h-full">
+		<div className="w-full max-w-sm h-full">
 			<div className={cn(
 				"relative rounded-2xl p-4 w-full h-full flex flex-col",
 				"bg-gradient-to-br shadow-xl border border-white/20",
@@ -174,15 +156,9 @@ const EnterprisePlanCard = ({ cardHeight }: { cardHeight?: number }) => (
 	</div>
 )
 
-const CustomPlanCard = ({ cardHeight }: { cardHeight?: number }) => (
-	<div className="p-4 flex justify-center">
-		<div 
-			className="w-full max-w-sm" 
-			style={{ 
-				height: cardHeight ? `${cardHeight}px` : 'auto',
-				aspectRatio: cardHeight ? 'unset' : '1.78/1'
-			}}
-		>
+const CustomPlanCard = () => (
+	<div className="p-4 flex justify-center h-full">
+		<div className="w-full max-w-sm h-full">
 			<div className={cn(
 				"relative rounded-2xl p-4 w-full h-full flex flex-col",
 				"bg-gradient-to-br shadow-xl border border-white/20",
@@ -224,88 +200,31 @@ const CustomPlanCard = ({ cardHeight }: { cardHeight?: number }) => (
 )
 
 export function DrawerDemo() {
-	const drawerContentRef = useRef<HTMLDivElement>(null)
-	const [emblaRef, emblaApi] = useEmblaCarousel({ 
+	const [emblaRef, emblaApi] = useEmblaCarousel({
 		direction: 'rtl',
 		loop: false,
-		align: 'start'
+		align: 'start',
 	})
 	const [currentSlide, setCurrentSlide] = useState(0)
-	const [cardHeight, setCardHeight] = useState<number>(0)
 
 	const onSelect = useCallback(() => {
 		if (!emblaApi) return
 		setCurrentSlide(emblaApi.selectedScrollSnap())
 	}, [emblaApi])
-
+	
 	useEffect(() => {
 		if (!emblaApi) return
 		onSelect()
 		emblaApi.on('select', onSelect)
 	}, [emblaApi, onSelect])
-
-	useEffect(() => {
-		const calculateCardHeight = () => {
-			if (drawerContentRef.current) {
-				// iOS-specific height calculation
-				const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-				
-				let drawerHeight
-				if (isIOS) {
-					// Use visual viewport on iOS if available, fallback to window.innerHeight
-					drawerHeight = window.visualViewport?.height || window.innerHeight * 0.95
-				} else {
-					drawerHeight = drawerContentRef.current.clientHeight
-				}
-				
-				const headerHeight = 100 // Approximate header height
-				const dotsHeight = 40 // Approximate dots height
-				const padding = 60 // Extra padding for iOS
-				const availableHeight = drawerHeight - headerHeight - dotsHeight - padding
-				const calculatedHeight = Math.max(200, availableHeight * 0.75) // Reduced to 75% for iOS
-				
-				console.log('iOS detected:', isIOS, 'Drawer height:', drawerHeight, 'Card height:', calculatedHeight)
-				setCardHeight(calculatedHeight)
-			}
-		}
-
-		// Multiple timing attempts for iOS
-		const timeouts = [
-			setTimeout(calculateCardHeight, 100),
-			setTimeout(calculateCardHeight, 300), // Additional delay for iOS
-			setTimeout(calculateCardHeight, 500)  // Final attempt
-		]
-
-		// Use ResizeObserver for better iOS support
-		let resizeObserver: ResizeObserver | null = null
-		if (drawerContentRef.current) {
-			resizeObserver = new ResizeObserver(calculateCardHeight)
-			resizeObserver.observe(drawerContentRef.current)
-		}
-
-		// Also listen to visual viewport changes for iOS
-		const handleVisualViewportChange = () => {
-			setTimeout(calculateCardHeight, 50)
-		}
-		
-		window.addEventListener('resize', calculateCardHeight)
-		window.visualViewport?.addEventListener('resize', handleVisualViewportChange)
-		
-		return () => {
-			timeouts.forEach(clearTimeout)
-			resizeObserver?.disconnect()
-			window.removeEventListener('resize', calculateCardHeight)
-			window.visualViewport?.removeEventListener('resize', handleVisualViewportChange)
-		}
-	}, [])
 	
 	return (
 		<Drawer shouldScaleBackground>
 			<DrawerTrigger
 				render={(props) => <Button {...props}>خطط الأسعار</Button>}
 			/>
-			<DrawerContent className="h-[95vh]" ref={drawerContentRef}>
-				<div className="mx-auto w-full max-w-md">
+			<DrawerContent className="h-[95vh]">
+				<div className="mx-auto w-full max-w-md h-full flex flex-col">
 					<DrawerHeader>
 						<DrawerTitle className="text-center">
 							باقات الاشتراك
@@ -316,19 +235,19 @@ export function DrawerDemo() {
 					</DrawerHeader>
 
 					<div className="flex flex-col gap-4 px-4 flex-1 overflow-hidden" dir="rtl">
-						<div className="embla overflow-hidden" ref={emblaRef}>
-							<div className="embla__container flex">
+						<div className="embla overflow-hidden flex-1" ref={emblaRef}>
+							<div className="embla__container flex h-full">
 								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
-									<BasicPlanCard cardHeight={cardHeight} />
+									<BasicPlanCard />
 								</div>
 								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
-									<ProfessionalPlanCard cardHeight={cardHeight} />
+									<ProfessionalPlanCard />
 								</div>
 								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
-									<EnterprisePlanCard cardHeight={cardHeight} />
+									<EnterprisePlanCard />
 								</div>
 								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
-									<CustomPlanCard cardHeight={cardHeight} />
+									<CustomPlanCard />
 								</div>
 							</div>
 						</div>
