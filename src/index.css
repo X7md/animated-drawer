@@ -8,10 +8,26 @@
 	.Root {
 		@apply isolate;
 	}
+	/* if landscape */
+	@media (orientation: landscape) {
+		.data-\[vaul-drawer-direction\=bottom\]\:max-h-\[80vh\] {
+			&[data-vaul-drawer-direction="bottom"] {
+				max-height: 100vh !important;
+			}
+		}
+	}
+	/* if portrait */
+	@media (orientation: portrait) {
+		.data-\[vaul-drawer-direction\=bottom\]\:max-h-\[80vh\] {
+			&[data-vaul-drawer-direction="bottom"] {
+				max-height: 85vh !important;
+			}
+		}
+	}
 }
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Vazirmatn", system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -130,6 +146,8 @@ button:focus-visible {
 	--radius-md: calc(var(--radius) - 2px);
 	--radius-lg: var(--radius);
 	--radius-xl: calc(var(--radius) + 4px);
+	--font-family-vazirmatn: "Vazirmatn", system-ui, sans-serif;
+	--font-family-sans: "Vazirmatn", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--color-card: var(--card);
