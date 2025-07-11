@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback, useEffect, useRef } from "react"
 import useEmblaCarousel from 'embla-carousel-react'
 import { Button } from "@/components/ui/button"
 import {
@@ -11,95 +11,227 @@ import {
 } from "@/components/ui/drawer"
 import { cn } from "@/lib/utils"
 
-const pricingPlans = [
-  {
-    name: "الباقة الأساسية",
-    subtitle: "للأفراد والشركات الناشئة",
-    price: "99",
-    currency: "ريال",
-    period: "شهرياً",
-    popular: false,
-    features: [
-      "حتى 1,000 معاملة شهرياً",
-      "لوحة تحكم أساسية",
-      "دعم فني عبر البريد الإلكتروني",
-      "تقارير أساسية",
-      "تشفير SSL المتقدم",
-      "تكامل مع 5 منصات"
-    ],
-    buttonText: "ابدأ الآن",
-    gradient: "from-blue-400 to-blue-600"
-  },
-  {
-    name: "الباقة الاحترافية",
-    subtitle: "للشركات المتوسطة",
-    price: "299",
-    currency: "ريال",
-    period: "شهرياً",
-    popular: true,
-    features: [
-      "حتى 10,000 معاملة شهرياً",
-      "لوحة تحكم متقدمة",
-      "دعم فني على مدار الساعة",
-      "تقارير تفصيلية وتحليلات",
-      "حماية من الاحتيال",
-      "تكامل مع 20 منصة",
-      "إدارة الفريق",
-      "خصومات حجم المعاملات"
-    ],
-    buttonText: "الأكثر شعبية",
-    gradient: "from-purple-500 to-pink-500"
-  },
-  {
-    name: "الباقة المؤسسية",
-    subtitle: "للشركات الكبيرة",
-    price: "999",
-    currency: "ريال",
-    period: "شهرياً",
-    popular: false,
-    features: [
-      "معاملات غير محدودة",
-      "لوحة تحكم مخصصة",
-      "مدير حساب مخصص",
-      "تقارير مخصصة وAPI متقدم",
-      "حماية متقدمة من الاحتيال",
-      "تكامل غير محدود",
-      "إدارة متقدمة للمستخدمين",
-      "دعم أولوية قصوى",
-      "تدريب مخصص"
-    ],
-    buttonText: "تواصل معنا",
-    gradient: "from-amber-400 to-orange-500"
-  },
-  {
-    name: "الباقة المخصصة",
-    subtitle: "حلول مخصصة لاحتياجاتك",
-    price: "حسب الطلب",
-    currency: "",
-    period: "",
-    popular: false,
-    features: [
-      "حلول مخصصة بالكامل",
-      "تطوير ميزات خاصة",
-      "تكامل مخصص",
-      "استضافة مخصصة",
-      "امتثال مخصص",
-      "تدريب شامل للفريق",
-      "دعم على مستوى المؤسسة",
-      "اتفاقية مستوى خدمة مخصصة"
-    ],
-    buttonText: "احصل على عرض سعر",
-    gradient: "from-emerald-400 to-cyan-500"
-  }
-]
+// Individual Card Components
+const BasicPlanCard = ({ cardHeight }: { cardHeight?: number }) => (
+	<div className="p-4 flex justify-center">
+		<div 
+			className="w-full max-w-sm" 
+			style={{ 
+				height: cardHeight ? `${cardHeight}px` : 'auto',
+				aspectRatio: cardHeight ? 'unset' : '1.78/1'
+			}}
+		>
+			<div className={cn(
+				"relative rounded-2xl p-4 w-full h-full flex flex-col",
+				"bg-gradient-to-br shadow-xl border border-white/20",
+				"backdrop-blur-sm from-blue-400 to-blue-600"
+			)}>
+				<div className="text-center mb-3 text-white">
+					<h3 className="text-lg font-bold mb-1">الباقة الأساسية</h3>
+					<p className="text-xs opacity-90 mb-2">للأفراد والشركات الناشئة</p>
+					
+					<div className="mb-2">
+						<div className="flex items-baseline justify-center gap-1">
+							<span className="text-2xl font-bold">99</span>
+							<span className="text-sm">ريال</span>
+							<span className="text-xs opacity-75">/شهرياً</span>
+						</div>
+					</div>
+				</div>
+
+				<div className="flex-1 mb-3 overflow-hidden">
+					<div className="h-full overflow-y-auto">
+						<ul className="space-y-1">
+							{["حتى 1,000 معاملة شهرياً", "لوحة تحكم أساسية", "دعم فني عبر البريد الإلكتروني", "تقارير أساسية", "تشفير SSL المتقدم", "تكامل مع 5 منصات"].slice(0, 6).map((feature, index) => (
+								<li key={index} className="flex items-center text-white text-xs">
+									<svg className="w-3 h-3 ml-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+									</svg>
+									<span className="leading-tight">{feature}</span>
+								</li>
+							))}
+						</ul>
+					</div>
+				</div>
+
+				<Button className="w-full text-sm font-semibold py-2 rounded-lg transition-all duration-200 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30">
+					ابدأ الآن
+				</Button>
+			</div>
+		</div>
+	</div>
+)
+
+const ProfessionalPlanCard = ({ cardHeight }: { cardHeight?: number }) => (
+	<div className="p-4 flex justify-center">
+		<div 
+			className="w-full max-w-sm" 
+			style={{ 
+				height: cardHeight ? `${cardHeight}px` : 'auto',
+				aspectRatio: cardHeight ? 'unset' : '1.78/1'
+			}}
+		>
+			<div className={cn(
+				"relative rounded-2xl p-4 w-full h-full flex flex-col",
+				"bg-gradient-to-br shadow-xl border border-white/20",
+				"backdrop-blur-sm from-purple-500 to-pink-500"
+			)}>
+				<div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+					<span className="bg-white text-purple-600 text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+						الأكثر شعبية
+					</span>
+				</div>
+				
+				<div className="text-center mb-3 text-white">
+					<h3 className="text-lg font-bold mb-1">الباقة الاحترافية</h3>
+					<p className="text-xs opacity-90 mb-2">للشركات المتوسطة</p>
+					
+					<div className="mb-2">
+						<div className="flex items-baseline justify-center gap-1">
+							<span className="text-2xl font-bold">299</span>
+							<span className="text-sm">ريال</span>
+							<span className="text-xs opacity-75">/شهرياً</span>
+						</div>
+					</div>
+				</div>
+
+				<div className="flex-1 mb-3 overflow-hidden">
+					<div className="h-full overflow-y-auto">
+						<ul className="space-y-1">
+							{["حتى 10,000 معاملة شهرياً", "لوحة تحكم متقدمة", "دعم فني على مدار الساعة", "تقارير تفصيلية وتحليلات", "حماية من الاحتيال", "تكامل مع 20 منصة"].slice(0, 6).map((feature, index) => (
+								<li key={index} className="flex items-center text-white text-xs">
+									<svg className="w-3 h-3 ml-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+									</svg>
+									<span className="leading-tight">{feature}</span>
+								</li>
+							))}
+							<li className="text-white text-xs opacity-75 text-center pt-1">
+								+ 2 ميزة إضافية
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<Button className="w-full text-sm font-semibold py-2 rounded-lg transition-all duration-200 bg-white text-purple-600 hover:bg-gray-100 shadow-lg">
+					الأكثر شعبية
+				</Button>
+			</div>
+		</div>
+	</div>
+)
+
+const EnterprisePlanCard = ({ cardHeight }: { cardHeight?: number }) => (
+	<div className="p-4 flex justify-center">
+		<div 
+			className="w-full max-w-sm" 
+			style={{ 
+				height: cardHeight ? `${cardHeight}px` : 'auto',
+				aspectRatio: cardHeight ? 'unset' : '1.78/1'
+			}}
+		>
+			<div className={cn(
+				"relative rounded-2xl p-4 w-full h-full flex flex-col",
+				"bg-gradient-to-br shadow-xl border border-white/20",
+				"backdrop-blur-sm from-amber-400 to-orange-500"
+			)}>
+				<div className="text-center mb-3 text-white">
+					<h3 className="text-lg font-bold mb-1">الباقة المؤسسية</h3>
+					<p className="text-xs opacity-90 mb-2">للشركات الكبيرة</p>
+					
+					<div className="mb-2">
+						<div className="flex items-baseline justify-center gap-1">
+							<span className="text-2xl font-bold">999</span>
+							<span className="text-sm">ريال</span>
+							<span className="text-xs opacity-75">/شهرياً</span>
+						</div>
+					</div>
+				</div>
+
+				<div className="flex-1 mb-3 overflow-hidden">
+					<div className="h-full overflow-y-auto">
+						<ul className="space-y-1">
+							{["معاملات غير محدودة", "لوحة تحكم مخصصة", "مدير حساب مخصص", "تقارير مخصصة وAPI متقدم", "حماية متقدمة من الاحتيال", "تكامل غير محدود"].slice(0, 6).map((feature, index) => (
+								<li key={index} className="flex items-center text-white text-xs">
+									<svg className="w-3 h-3 ml-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+									</svg>
+									<span className="leading-tight">{feature}</span>
+								</li>
+							))}
+							<li className="text-white text-xs opacity-75 text-center pt-1">
+								+ 3 ميزة إضافية
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<Button className="w-full text-sm font-semibold py-2 rounded-lg transition-all duration-200 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30">
+					تواصل معنا
+				</Button>
+			</div>
+		</div>
+	</div>
+)
+
+const CustomPlanCard = ({ cardHeight }: { cardHeight?: number }) => (
+	<div className="p-4 flex justify-center">
+		<div 
+			className="w-full max-w-sm" 
+			style={{ 
+				height: cardHeight ? `${cardHeight}px` : 'auto',
+				aspectRatio: cardHeight ? 'unset' : '1.78/1'
+			}}
+		>
+			<div className={cn(
+				"relative rounded-2xl p-4 w-full h-full flex flex-col",
+				"bg-gradient-to-br shadow-xl border border-white/20",
+				"backdrop-blur-sm from-emerald-400 to-cyan-500"
+			)}>
+				<div className="text-center mb-3 text-white">
+					<h3 className="text-lg font-bold mb-1">الباقة المخصصة</h3>
+					<p className="text-xs opacity-90 mb-2">حلول مخصصة لاحتياجاتك</p>
+					
+					<div className="mb-2">
+						<div className="text-lg font-bold">حسب الطلب</div>
+					</div>
+				</div>
+
+				<div className="flex-1 mb-3 overflow-hidden">
+					<div className="h-full overflow-y-auto">
+						<ul className="space-y-1">
+							{["حلول مخصصة بالكامل", "تطوير ميزات خاصة", "تكامل مخصص", "استضافة مخصصة", "امتثال مخصص", "تدريب شامل للفريق"].slice(0, 6).map((feature, index) => (
+								<li key={index} className="flex items-center text-white text-xs">
+									<svg className="w-3 h-3 ml-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+										<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+									</svg>
+									<span className="leading-tight">{feature}</span>
+								</li>
+							))}
+							<li className="text-white text-xs opacity-75 text-center pt-1">
+								+ 2 ميزة إضافية
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<Button className="w-full text-sm font-semibold py-2 rounded-lg transition-all duration-200 bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30">
+					احصل على عرض سعر
+				</Button>
+			</div>
+		</div>
+	</div>
+)
 
 export function DrawerDemo() {
+	const drawerContentRef = useRef<HTMLDivElement>(null)
 	const [emblaRef, emblaApi] = useEmblaCarousel({ 
 		direction: 'rtl',
 		loop: false,
 		align: 'start'
 	})
 	const [currentSlide, setCurrentSlide] = useState(0)
+	const [cardHeight, setCardHeight] = useState<number>(0)
 
 	const onSelect = useCallback(() => {
 		if (!emblaApi) return
@@ -111,13 +243,68 @@ export function DrawerDemo() {
 		onSelect()
 		emblaApi.on('select', onSelect)
 	}, [emblaApi, onSelect])
+
+	useEffect(() => {
+		const calculateCardHeight = () => {
+			if (drawerContentRef.current) {
+				// iOS-specific height calculation
+				const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+				
+				let drawerHeight
+				if (isIOS) {
+					// Use visual viewport on iOS if available, fallback to window.innerHeight
+					drawerHeight = window.visualViewport?.height || window.innerHeight * 0.95
+				} else {
+					drawerHeight = drawerContentRef.current.clientHeight
+				}
+				
+				const headerHeight = 100 // Approximate header height
+				const dotsHeight = 40 // Approximate dots height
+				const padding = 60 // Extra padding for iOS
+				const availableHeight = drawerHeight - headerHeight - dotsHeight - padding
+				const calculatedHeight = Math.max(200, availableHeight * 0.75) // Reduced to 75% for iOS
+				
+				console.log('iOS detected:', isIOS, 'Drawer height:', drawerHeight, 'Card height:', calculatedHeight)
+				setCardHeight(calculatedHeight)
+			}
+		}
+
+		// Multiple timing attempts for iOS
+		const timeouts = [
+			setTimeout(calculateCardHeight, 100),
+			setTimeout(calculateCardHeight, 300), // Additional delay for iOS
+			setTimeout(calculateCardHeight, 500)  // Final attempt
+		]
+
+		// Use ResizeObserver for better iOS support
+		let resizeObserver: ResizeObserver | null = null
+		if (drawerContentRef.current) {
+			resizeObserver = new ResizeObserver(calculateCardHeight)
+			resizeObserver.observe(drawerContentRef.current)
+		}
+
+		// Also listen to visual viewport changes for iOS
+		const handleVisualViewportChange = () => {
+			setTimeout(calculateCardHeight, 50)
+		}
+		
+		window.addEventListener('resize', calculateCardHeight)
+		window.visualViewport?.addEventListener('resize', handleVisualViewportChange)
+		
+		return () => {
+			timeouts.forEach(clearTimeout)
+			resizeObserver?.disconnect()
+			window.removeEventListener('resize', calculateCardHeight)
+			window.visualViewport?.removeEventListener('resize', handleVisualViewportChange)
+		}
+	}, [])
 	
 	return (
 		<Drawer shouldScaleBackground>
 			<DrawerTrigger
 				render={(props) => <Button {...props}>خطط الأسعار</Button>}
 			/>
-			<DrawerContent className="h-[95vh]">
+			<DrawerContent className="h-[95vh]" ref={drawerContentRef}>
 				<div className="mx-auto w-full max-w-md">
 					<DrawerHeader>
 						<DrawerTitle className="text-center">
@@ -131,85 +318,24 @@ export function DrawerDemo() {
 					<div className="flex flex-col gap-4 px-4 flex-1 overflow-hidden" dir="rtl">
 						<div className="embla overflow-hidden" ref={emblaRef}>
 							<div className="embla__container flex">
-								{pricingPlans.map((plan, index) => (
-									<div key={index} className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
-										<div className="p-4 flex justify-center">
-											<div 
-												className="w-full max-w-sm"
-												style={{ aspectRatio: '1.78/1' }}
-											>
-												<div className={cn(
-													"relative rounded-2xl p-4 w-full h-full flex flex-col",
-													"bg-gradient-to-br shadow-xl border border-white/20",
-													"backdrop-blur-sm",
-													plan.gradient
-												)}>
-													{plan.popular && (
-														<div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-															<span className="bg-white text-purple-600 text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-																الأكثر شعبية
-															</span>
-														</div>
-													)}
-													
-													<div className="text-center mb-3 text-white">
-														<h3 className="text-lg font-bold mb-1">{plan.name}</h3>
-														<p className="text-xs opacity-90 mb-2">{plan.subtitle}</p>
-														
-														<div className="mb-2">
-															{plan.price === "حسب الطلب" ? (
-																<div className="text-lg font-bold">{plan.price}</div>
-															) : (
-																<div className="flex items-baseline justify-center gap-1">
-																	<span className="text-2xl font-bold">{plan.price}</span>
-																	<span className="text-sm">{plan.currency}</span>
-																	<span className="text-xs opacity-75">/{plan.period}</span>
-																</div>
-															)}
-														</div>
-													</div>
-
-													<div className="flex-1 mb-3 overflow-hidden">
-														<div className="h-full overflow-y-auto">
-															<ul className="space-y-1">
-																{plan.features.slice(0, 6).map((feature, featureIndex) => (
-																	<li key={featureIndex} className="flex items-center text-white text-xs">
-																		<svg className="w-3 h-3 ml-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-																			<path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-																		</svg>
-																		<span className="leading-tight">{feature}</span>
-																	</li>
-																))}
-																{plan.features.length > 6 && (
-																	<li className="text-white text-xs opacity-75 text-center pt-1">
-																		+ {plan.features.length - 6} ميزة إضافية
-																	</li>
-																)}
-															</ul>
-														</div>
-													</div>
-
-													<Button 
-														className={cn(
-															"w-full text-sm font-semibold py-2 rounded-lg transition-all duration-200",
-															plan.popular 
-																? "bg-white text-purple-600 hover:bg-gray-100 shadow-lg" 
-																: "bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30"
-														)}
-													>
-														{plan.buttonText}
-													</Button>
-												</div>
-											</div>
-										</div>
-									</div>
-								))}
+								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
+									<BasicPlanCard cardHeight={cardHeight} />
+								</div>
+								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
+									<ProfessionalPlanCard cardHeight={cardHeight} />
+								</div>
+								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
+									<EnterprisePlanCard cardHeight={cardHeight} />
+								</div>
+								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
+									<CustomPlanCard cardHeight={cardHeight} />
+								</div>
 							</div>
 						</div>
 						
 						{/* Slide indicators */}
 						<div className="flex justify-center mb-4 gap-2">
-							{pricingPlans.map((_, index) => (
+							{[0, 1, 2, 3].map((index) => (
 								<span
 									key={index}
 									className={cn(
