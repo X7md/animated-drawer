@@ -1,4 +1,10 @@
-import { useState, useCallback, useEffect } from "react"
+import {
+	useState,
+	useCallback,
+	useEffect,
+	forwardRef,
+	useImperativeHandle,
+} from "react"
 import useEmblaCarousel from 'embla-carousel-react'
 import { Button } from "@/components/ui/button"
 import {
@@ -7,7 +13,6 @@ import {
 	DrawerDescription,
 	DrawerHeader,
 	DrawerTitle,
-	DrawerTrigger,
 } from "@/components/ui/drawer"
 import { cn } from "@/lib/utils"
 
@@ -199,85 +204,103 @@ const CustomPlanCard = () => (
 	</div>
 )
 
-export function DrawerDemo() {
-	const [emblaRef, emblaApi] = useEmblaCarousel({
-		direction: 'rtl',
-		loop: false,
-		align: 'start',
-	})
-	const [currentSlide, setCurrentSlide] = useState(0)
+export type DrawerDemoHandle = {
+	open: () => void
+}
 
-	const onSelect = useCallback(() => {
-		if (!emblaApi) return
-		setCurrentSlide(emblaApi.selectedScrollSnap())
-	}, [emblaApi])
-	
-	useEffect(() => {
-		if (!emblaApi) return
-		onSelect()
-		emblaApi.on('select', onSelect)
-	}, [emblaApi, onSelect])
-	
-	return (
-		<Drawer shouldScaleBackground>
-			<DrawerTrigger
-				render={(props) => <Button {...props}>خطط الأسعار</Button>}
-			/>
-			<DrawerContent className="h-[95vh]">
-				<div className="mx-auto w-full max-w-md h-full flex flex-col">
-					<DrawerHeader>
-						<DrawerTitle className="text-center">
-							باقات الاشتراك
-						</DrawerTitle>
-						<DrawerDescription className="text-center">
-							اختر الباقة المناسبة لاحتياجاتك
-						</DrawerDescription>
-					</DrawerHeader>
+type DrawerDemoProps = {
+	openOnLoad?: boolean
+}
 
-					<div className="flex flex-col gap-4 px-4 flex-1 overflow-hidden" dir="rtl">
-						<div className="embla overflow-hidden flex-1" ref={emblaRef}>
-							<div className="embla__container flex h-full">
-								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
-									<BasicPlanCard />
-								</div>
-								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
-									<ProfessionalPlanCard />
-								</div>
-								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
-									<EnterprisePlanCard />
-								</div>
-								<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
-									<CustomPlanCard />
+export const DrawerDemo = forwardRef<DrawerDemoHandle, DrawerDemoProps>(
+	({ openOnLoad = false }, ref) => {
+		const [open, setOpen] = useState(false)
+		const [emblaRef, emblaApi] = useEmblaCarousel({
+			direction: 'rtl',
+			loop: false,
+			align: 'start',
+		})
+		const [currentSlide, setCurrentSlide] = useState(0)
+
+		const onSelect = useCallback(() => {
+			if (!emblaApi) return
+			setCurrentSlide(emblaApi.selectedScrollSnap())
+		}, [emblaApi])
+
+		useImperativeHandle(ref, () => ({
+			open: () => setOpen(true),
+		}))
+
+		useEffect(() => {
+			if (!emblaApi) return
+			onSelect()
+			emblaApi.on('select', onSelect)
+		}, [emblaApi, onSelect])
+
+		useEffect(() => {
+			if (openOnLoad) {
+				setOpen(true)
+			}
+		}, [openOnLoad])
+
+		return (
+			<Drawer open={open} onOpenChange={setOpen} shouldScaleBackground>
+				<DrawerContent className="h-[95vh]">
+					<div className="mx-auto w-full max-w-md h-full flex flex-col">
+						<DrawerHeader>
+							<DrawerTitle className="text-center">
+								باقات الاشتراك
+							</DrawerTitle>
+							<DrawerDescription className="text-center">
+								اختر الباقة المناسبة لاحتياجاتك
+							</DrawerDescription>
+						</DrawerHeader>
+
+						<div className="flex flex-col gap-4 px-4 flex-1 overflow-hidden" dir="rtl">
+							<div className="embla overflow-hidden flex-1" ref={emblaRef}>
+								<div className="embla__container flex h-full">
+									<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
+										<BasicPlanCard />
+									</div>
+									<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
+										<ProfessionalPlanCard />
+									</div>
+									<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
+										<EnterprisePlanCard />
+									</div>
+									<div className="embla__slide flex-shrink-0 flex-grow-0 basis-full min-w-0">
+										<CustomPlanCard />
+									</div>
 								</div>
 							</div>
+							
+							{/* Slide indicators */}
+							<div className="flex justify-center mb-4 gap-2">
+								{[0, 1, 2, 3].map((index) => (
+									<span
+										key={index}
+										className={cn(
+											"size-2 rounded-full transition-colors cursor-pointer",
+											index === currentSlide ? 'bg-black' : 'bg-gray-200'
+										)}
+										onClick={() => emblaApi?.scrollTo(index)}
+									></span>
+								))}
+							</div>
 						</div>
-						
-						{/* Slide indicators */}
-						<div className="flex justify-center mb-4 gap-2">
-							{[0, 1, 2, 3].map((index) => (
-								<span
-									key={index}
-									className={cn(
-										"size-2 rounded-full transition-colors cursor-pointer",
-										index === currentSlide ? 'bg-black' : 'bg-gray-200'
-									)}
-									onClick={() => emblaApi?.scrollTo(index)}
-								></span>
-							))}
-						</div>
-					</div>
 
-					{/* <DrawerFooter>
-						<DrawerClose
-							render={(props) => (
-								<Button {...props} variant="outline" className="w-full">
-									إغلاق
-								</Button>
-							)}
-						/>
-					</DrawerFooter> */}
-				</div>
-			</DrawerContent>
-		</Drawer>
-	)
-}
+						{/* <DrawerFooter>
+							<DrawerClose
+								render={(props) => (
+									<Button {...props} variant="outline" className="w-full">
+										إغلاق
+									</Button>
+								)}
+							/>
+						</DrawerFooter> */}
+					</div>
+				</DrawerContent>
+			</Drawer>
+		)
+	}
+)
